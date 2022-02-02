@@ -1,12 +1,17 @@
 package controllers;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import actions.ActionBase;
+import actions.UnknownAction;
+import constants.ForwardConst;
 
 @WebServlet(name="FrontController", urlPatterns={"/"})
 public class FrontController extends HttpServlet {
@@ -18,10 +23,44 @@ public class FrontController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        //パラメータに該当するActionクラスのインスタンス
+        ActionBase action = getAction(request, response);
+
+        //サーブレットコンテキスト、リクエスト、レスポンスをActionインスタンスのフィールドに設定
+        action.init(getServletContext(), request, response);
+
+        //Actionクラスの処理を呼び出し
+        action.process();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private ActionBase getAction(HttpServletRequest request, HttpServletResponse response) {
+        Class type = null;
+        ActionBase action = null;
+
+
+            try {
+                //クエリパラメータからactionの値を取得
+                String actionString = request.getParameter(ForwardConst.ACT.getValue());
+
+                //該当するActionのオブジェクトを作成
+                type = Class.forName(String.format("actions.%sAction", actionString));
+
+                //ポリモーフィズムを利用し、各Actionでも対応可能な親クラスActionBaseオブジェクトにキャスト
+                action = (ActionBase)(type.asSubclass(ActionBase.class)
+                        .getDeclaredConstructor()
+                        .newInstance());
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+
+                action = new UnknownAction();
+            }
+
+            return action;
     }
 
 }
