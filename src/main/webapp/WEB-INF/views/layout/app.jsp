@@ -5,9 +5,9 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <title>支払い管理システム</title>
-        <link>
-        <link>
+        <title><c:out value="支払い管理システム" /></title>
+        <link rel="stylesheet" href="<c:url value='/css/reset.css' />">
+        <link rel="stylesheet" href="<c:url value='/css/style.css' />">
     </head>
     <body>
         <div id="wrapper">
