@@ -21,13 +21,14 @@ h1 {
     width: 94%;
     padding-top: 17px;
     padding-left: 3%;
-    font-size: 24px;
+    font-size: 30px;
     color: #333333;
 }
 
 h2 {
-    font-size: 20px;
+    font-size: 25px;
     margin-bottom: 15px;
+    text-align: center;
 }
 
 li {
@@ -91,4 +92,7 @@ button {
     margin-bottom: 15px;
     color: #721c24;
     background-color: #f8d7da;
+}
+#login_fomat{
+    text-align: center;
 }

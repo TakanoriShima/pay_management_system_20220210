@@ -29,8 +29,8 @@ import lombok.Setter;
             name = JpaConst.Q_USER_COUNT,
             query = JpaConst.Q_USER_COUNT_DEF),
     @NamedQuery(
-            name = JpaConst.Q_USER_COUNT_RESISTERED_BY_CODE,
-            query = JpaConst.Q_USER_COUNT_RESISTERED_BY_CODE_DEF),
+            name = JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL,
+            query = JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL_DEF),
     @NamedQuery(
             name = JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD,
             query = JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD_DEF)

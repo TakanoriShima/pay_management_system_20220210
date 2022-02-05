@@ -36,6 +36,6 @@ public interface JpaConst {
     String Q_USER_GET_BY_EMAIL_AND_PASSWORD = ENTITY_USER + "getByCodeAndPassword";
     String Q_USER_GET_BY_EMAIL_AND_PASSWORD_DEF = "SELECT e FROM User AS e WHERE e.email = :" + JPQL_PARM_EMAIL + " AND e.password = :" + JPQL_PARM_PASSWORD;
     //指定したemailを保持するユーザーの件数を取得
-    String Q_USER_COUNT_RESISTERED_BY_CODE = ENTITY_USER + ".countRegisteredByCode";
-    String Q_USER_COUNT_RESISTERED_BY_CODE_DEF = "SELECT COUNT(e) FROM User AS e WHERE e.email = :" + JPQL_PARM_EMAIL;
+    String Q_USER_COUNT_RESISTERED_BY_EMAIL = ENTITY_USER + ".countRegisteredByCode";
+    String Q_USER_COUNT_RESISTERED_BY_EMAIL_DEF = "SELECT COUNT(e) FROM User AS e WHERE e.email = :" + JPQL_PARM_EMAIL;
 }

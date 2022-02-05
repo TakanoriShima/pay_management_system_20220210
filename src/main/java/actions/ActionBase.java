@@ -9,7 +9,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.stream.events.Attribute;
 
 import constants.AttributeConst;
 import constants.ForwardConst;
@@ -176,7 +175,7 @@ public abstract class ActionBase {
      * @return パラメータの値（ジェネリクス）
      */
     @SuppressWarnings("unchecked")
-    protected <R> R getSessionScope(Attribute key) {
+    protected <R> R getSessionScope(AttributeConst key) {
         return (R) request.getSession().getAttribute(key.getValue());
     }
 
@@ -193,7 +192,7 @@ public abstract class ActionBase {
      * セッションスコープの指定された名前のパラメータを除去する
      * @param key パラメータ名
      */
-    protected void removeSessionScope(Attribute key) {
+    protected void removeSessionScope(AttributeConst key) {
         request.getSession().removeAttribute(key.getValue());
     }
 
