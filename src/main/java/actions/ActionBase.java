@@ -67,7 +67,7 @@ public abstract class ActionBase {
                 commandMethod.invoke(this, new Object[0]);
             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                // 例外をコンソー路に表示
+                // 例外をコンソールに表示
                 e.printStackTrace();
                 //commandの値が不正で実行できない場合エラー画面を呼び出し
                 forward(ForwardConst.FW_ERR_UNKNOWN);

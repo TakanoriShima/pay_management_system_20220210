@@ -11,6 +11,7 @@ public enum ForwardConst {
     ACT("action"),
     ACT_AUTH("Auth"),
     ACT_USER("User"),
+    ACT_PAYMENT("Payment"),
 
 
     //command

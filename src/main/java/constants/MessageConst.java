@@ -6,7 +6,8 @@ package constants;
  */
 
 public enum MessageConst {
-
+    //DB更新
+    I_REGISTERED("登録が完了しました。"),
     //バリデーション
     E_NONAME("名前を入力してください"),
     E_NOEMAIL("メールアドレスを入力してください"),

@@ -9,6 +9,7 @@ public enum AttributeConst {
 
     //入力フォーム共通
     TOKEN("_token"),
+    ERR("errors"),
 
     //ログイン画面
     LOGIN_ERR("loginError"),

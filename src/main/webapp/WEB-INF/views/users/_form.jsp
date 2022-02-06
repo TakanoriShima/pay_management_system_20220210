@@ -24,7 +24,7 @@
 <br /><br />
 
 <label for="${AttributeConst.USER_PASSWORD.getValue()}">パスワード</label><br />
-<input type="text" name="${AttributeConst.USER_PASSWORD.getValue()}" value="${user.password}" />
+<input type="password" name="${AttributeConst.USER_PASSWORD.getValue()}" value="${user.password}" />
 <br /><br />
 
 <input type="hidden" name="${AttributeConst.USER_ID.getValue()}" value="${user.id}" />

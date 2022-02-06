@@ -35,7 +35,7 @@ public class UserService extends ServiceBase {
     public long countByEmail(String email) {
 
         //指定したメールアドレスを保持するユーザーの件数を取得
-        long users_count = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL, long.class)
+        long users_count = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL, Long.class)
                 .setParameter(JpaConst.JPQL_PARM_EMAIL, email)
                 .getSingleResult();
         return users_count;
@@ -117,7 +117,7 @@ public class UserService extends ServiceBase {
         UserView savedUser = findOne(uv.getId());
 
         boolean validateEmail = false;
-        //メールアドレスが登録んされているものとあっていればパスワードを変更
+        //メールアドレスが登録されているものとあっていればパスワードを変更
         if(!savedUser.getEmail().equals(uv.getEmail())) {
 
             boolean validatePass  = false;
