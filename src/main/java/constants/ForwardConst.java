@@ -10,13 +10,20 @@ public enum ForwardConst {
     //action
     ACT("action"),
     ACT_AUTH("Auth"),
+    ACT_USER("User"),
+
 
     //command
     CMD("command"),
     CMD_LOGIN("login"),
     CMD_LOGOUT("logout"),
+    CMD_INDEX("index"),
+    CMD_NEW("entryNew"),
+    CMD_CREATE("create"),
+    CMD_SHOW_LOGIN("showLogin"),
     //jsp
     FW_ERR_UNKNOWN("error/unknown"),
+    FW_USER_NEW("users/new"),
     FW_LOGIN("login/login");
 
     /**

@@ -15,6 +15,7 @@ body {
     width: 94%;
     margin-top: 15px;
     padding-left: 3%;
+    text-align: center;
 }
 
 h1 {
@@ -95,4 +96,11 @@ button {
 }
 #login_fomat{
     text-align: center;
+}
+.rightButton{
+    text-align: right;
+}
+
+.leftButton{
+    text-align: left;
 }
