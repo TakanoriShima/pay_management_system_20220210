@@ -29,7 +29,8 @@ public enum ForwardConst {
     FW_ERR_UNKNOWN("error/unknown"),
     FW_USER_NEW("users/new"),
     FW_USER_EDIT("users/edit"),
-    FW_LOGIN("login/login");
+    FW_LOGIN("login/login"),
+    FW_TOP_INDEX("topPage/index");
 
     /**
      * 文字列
