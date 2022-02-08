@@ -155,8 +155,13 @@ public abstract class ActionBase {
      */
     protected int toNumber(String strNumber) {
         int number = 0;
-        number = Integer.parseInt(strNumber);
+        try {
+            number = Integer.parseInt(strNumber);
 
+            return number;
+        } catch (NumberFormatException e) {
+            number = Integer.MIN_VALUE;
+        }
         return number;
     }
 

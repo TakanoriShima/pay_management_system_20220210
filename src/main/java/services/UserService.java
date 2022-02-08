@@ -85,6 +85,8 @@ public class UserService extends ServiceBase {
         return u;
     }
 
+
+
     /**
      * 画面から入力されたユーザーの登録内容を元にデータを一件作成し、ユーザーテーブルに登録する
      * @param uv  画面から入力されたユーザーの登録内容
@@ -111,16 +113,14 @@ public class UserService extends ServiceBase {
 
     public List<String> update(UserView uv, String pepper){
 
-        List<String> errors = null;
-
-        //idを条件に登録済みのユーザー情報を取得
-        UserView savedUser = findOne(uv.getId());
+        //メールアドレス、パスワードの条件にデータを取得
+        UserView savedUser = findOne(uv.getEmail(), uv.getPassword(), pepper);
 
         boolean validateEmail = false;
+        boolean validatePass = false;
         //メールアドレスが登録されているものとあっていればパスワードを変更
-        if(!savedUser.getEmail().equals(uv.getEmail())) {
+        if((savedUser.getEmail()).equals(uv.getEmail())) {
 
-            boolean validatePass  = false;
             if(uv.getPassword() != null && uv.getPassword().equals("")) {
                 //パスワードに入力がある場合
 
@@ -130,23 +130,19 @@ public class UserService extends ServiceBase {
                 //変更後のパスワードをハッシュ化し設定する
                 savedUser.setPassword(
                         EncryptUtil.getPasswordEncrypt(uv.getPassword(), pepper));
-
                 savedUser.setName(uv.getName());
-
-                //更新内容にバリデーションを行う
-                errors  = UserValidator.validate(this, savedUser, validateEmail, validatePass);
-
-                //バリデーションエラーがなければデータを更新する
-                if(errors.size() == 0) {
-                    update(savedUser);
-
-                  //エラーを返却
-                    return errors;
-
-                }
             }
         }
-        //
+
+          //更新内容にバリデーションを行う
+            List<String> errors  = UserValidator.validate(this, savedUser, validateEmail, validatePass);
+
+            //バリデーションエラーがなければデータを更新する
+            if(errors.size() == 0) {
+                update(savedUser);
+            }
+
+        //エラーを返却（エラーがなければ０件のリスト）
         return errors;
     }
 

@@ -85,4 +85,59 @@ public class UserAction extends ActionBase {
         }
     }
 
+    /**
+     * パスワード変更画面の表示
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void edit() throws ServletException, IOException {
+
+        putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
+        putSessionScope(AttributeConst.USER, new UserView());  //空のユーザーインスタンス
+
+        //編集画面を表示する
+        forward(ForwardConst.FW_USER_EDIT);
+    }
+
+    public void update() throws ServletException, IOException {
+
+        //CSRF対策 tokenのチェック
+        if(checkToken()) {
+            //パラメータの値を元にユーザー情報のインスタンスを作成する
+            UserView uv = new UserView(
+                    toNumber(getSessionScope(AttributeConst.USER_ID)),
+                    getSessionScope(AttributeConst.USER_NAME),
+                    getSessionScope(AttributeConst.USER_EMAIL),
+                    getSessionScope(AttributeConst.USER_PASSWORD));
+
+            //アプリケーションスコープからpepper文字列を取得
+            String pepper = getContextScope(PropertyConst.PEPPER);
+
+            //ユーザー情報更新
+            List<String> errors = service.update(uv, pepper);
+
+            if(errors.size() > 0) {
+                //更新中にエラーが発生した場合
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
+                putRequestScope(AttributeConst.USER, uv);  //入力されたユーザー情報
+                putRequestScope(AttributeConst.ERR, errors);  //エラーのリスト
+
+                //編集画面を再表示
+                forward(ForwardConst.FW_USER_EDIT);
+
+            }else {
+                //更新中にエラーがなかった場合
+
+                //セッションに更新完了のフラッシュメッセージを設定
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATE.getMessage());
+
+                //ログイン画面にリダイレクト
+                redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
+            }
+        }
+    }
+
+
+
 }
