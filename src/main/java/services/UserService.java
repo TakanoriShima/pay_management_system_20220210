@@ -17,7 +17,7 @@ import utils.EncryptUtil;
 public class UserService extends ServiceBase {
 
     /**
-     * ユーザーテーブルnのデータの件数を取得し、返却する
+     * ユーザーテーブルのデータの件数を取得し、返却する
      * @return ユーザーテーブルのデータの件数
      */
     public long countAll() {

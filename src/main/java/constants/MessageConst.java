@@ -6,6 +6,9 @@ package constants;
  */
 
 public enum MessageConst {
+
+    //認証
+    I_LOGINED("ログインしました"),
     //DB更新
     I_REGISTERED("登録が完了しました。"),
     I_UPDATE("変更完了しました。"),
