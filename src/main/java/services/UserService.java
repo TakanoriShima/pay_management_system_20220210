@@ -16,177 +16,164 @@ import utils.EncryptUtil;
 
 public class UserService extends ServiceBase {
 
-    /**
-     * ユーザーテーブルのデータの件数を取得し、返却する
-     * @return ユーザーテーブルのデータの件数
-     */
-    public long countAll() {
-        long userCount = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT, Long.class)
-                .getSingleResult();
+	/**
+	 * ユーザーテーブルのデータの件数を取得し、返却する
+	 * @return ユーザーテーブルのデータの件数
+	 */
+	public long countAll() {
+		long userCount = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT, Long.class)
+				.getSingleResult();
 
-        return userCount;
-    }
+		return userCount;
+	}
 
-    /**
-     * メールアドレスを条件に該当するデータの件数を取得し、返却する
-     * @param email
-     * @return
-     */
-    public long countByEmail(String email) {
+	/**
+	 * メールアドレスを条件に該当するデータの件数を取得し、返却する
+	 * @param email
+	 * @return
+	 */
+	public long countByEmail(String email) {
 
-        //指定したメールアドレスを保持するユーザーの件数を取得
-        long users_count = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL, Long.class)
-                .setParameter(JpaConst.JPQL_PARM_EMAIL, email)
-                .getSingleResult();
-        return users_count;
+		//指定したメールアドレスを保持するユーザーの件数を取得
+		long users_count = (long) em.createNamedQuery(JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL, Long.class)
+				.setParameter(JpaConst.JPQL_PARM_EMAIL, email)
+				.getSingleResult();
+		return users_count;
 
-    }
+	}
 
-    /**
-     * メールアドレス、パスワードの条件に取得したデータをUserViewインスタンスで返却する
-     * @param email メールアドレス
-     * @param plainPass パスワード文字列
-     * @param pepper pepper文字列
-     * @return 取得したデータのインスタンス 取得できない場合はnullで返す
-     */
-    public UserView findOne(String email, String plainPass, String pepper) {
-        User u = null;
+	/**
+	 * メールアドレス、パスワードの条件に取得したデータをUserViewインスタンスで返却する
+	 * @param email メールアドレス
+	 * @param plainPass パスワード文字列
+	 * @param pepper pepper文字列
+	 * @return 取得したデータのインスタンス 取得できない場合はnullで返す
+	 */
+	public UserView findOne(String email, String plainPass, String pepper) {
+		User u = null;
 
-        //パスワードのハッシュ化
-        String pass = EncryptUtil.getPasswordEncrypt(plainPass, pepper);
+		//パスワードのハッシュ化
+		String pass = EncryptUtil.getPasswordEncrypt(plainPass, pepper);
 
-        //メールアドレスとハッシュ化済みパスワードを条件にユーザーを一件取得
-        u = em.createNamedQuery(JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD, User.class)
-                .setParameter(JpaConst.JPQL_PARM_EMAIL, email)
-                .setParameter(JpaConst.JPQL_PARM_PASSWORD, pass)
-                .getSingleResult();
+		//メールアドレスとハッシュ化済みパスワードを条件にユーザーを一件取得
+		u = em.createNamedQuery(JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD, User.class)
+				.setParameter(JpaConst.JPQL_PARM_EMAIL, email)
+				.setParameter(JpaConst.JPQL_PARM_PASSWORD, pass)
+				.getSingleResult();
 
-        return UserConverter.toView(u);
+		return UserConverter.toView(u);
 
-    }
+	}
 
-    /**
-     * idを条件に取得したデータをUserViewのインスタンスで返却する
-     * @param id
-     * @return  取得データのインスタンス
-     */
-    public UserView findOne(int id) {
-        User u = findOneInternal(id);
-        return UserConverter.toView(u);
-    }
+	/**
+	 * idを条件に取得したデータをUserViewのインスタンスで返却する
+	 * @param id
+	 * @return  取得データのインスタンス
+	 */
+	public UserView findOne(int id) {
+		User u = findOneInternal(id);
+		return UserConverter.toView(u);
+	}
 
-    /**
-     * idを条件にデータを一件取得し、Userインスタンスで返却
-     * @param id
-     * @return 取得データのインスタンス
-     */
-    public User findOneInternal(int id) {
-        User u = em.find(User.class, id);
-        return u;
-    }
+	/**
+	 * idを条件にデータを一件取得し、Userインスタンスで返却
+	 * @param id
+	 * @return 取得データのインスタンス
+	 */
+	public User findOneInternal(int id) {
+		User u = em.find(User.class, id);
+		return u;
+	}
 
+	/**
+	 * 画面から入力されたユーザーの登録内容を元にデータを一件作成し、ユーザーテーブルに登録する
+	 * @param uv  画面から入力されたユーザーの登録内容
+	 * @param pepper  pepper文字列
+	 * @return バリデーションや登録処理中に発生したエラーのリスト
+	 */
+	public List<String> create(UserView uv, String pepper) {
 
+		//パスワードをハッシュ化して設定
+		String pass = EncryptUtil.getPasswordEncrypt(uv.getPassword(), pepper);
+		uv.setPassword(pass);
 
-    /**
-     * 画面から入力されたユーザーの登録内容を元にデータを一件作成し、ユーザーテーブルに登録する
-     * @param uv  画面から入力されたユーザーの登録内容
-     * @param pepper  pepper文字列
-     * @return バリデーションや登録処理中に発生したエラーのリスト
-     */
-    public List<String> create(UserView uv, String pepper){
+		//登録内容のバリデーションを行う
+		List<String> errors = UserValidator.validate(this, uv, true, true);
 
-        //パスワードをハッシュ化して設定
-        String pass = EncryptUtil.getPasswordEncrypt(uv.getPassword(), pepper);
-        uv.setPassword(pass);
+		//バリデーションエラーがなければデータを登録
+		if (errors.size() == 0) {
+			create(uv);
+		}
 
-        //登録内容のバリデーションを行う
-        List<String> errors = UserValidator.validate(this, uv, true, true);
+		//エラーがあれば該当メッセージを返却
+		return errors;
+	}
 
-        //バリデーションエラーがなければデータを登録
-        if(errors.size() == 0) {
-            create(uv);
-        }
+	public void update(UserView uv, String pepper) {
+		User u = this.findOneInternal(uv.getId());
+		u.setName(uv.getName());
+		u.setPassword(EncryptUtil.getPasswordEncrypt(uv.getPassword(), pepper));
 
-        //エラーがあれば該当メッセージを返却
-        return errors;
-    }
+		em.getTransaction().begin();
+		em.getTransaction().commit();
+		em.close();
+	}
 
-    public List<String> update(UserView uv, String pepper){
+	public Boolean validateLogin(String email, String plainPass, String pepper) {
 
-        //メールアドレス、パスワードの条件にデータを取得
-        UserView savedUser = findOne(uv.getEmail(), uv.getPassword(), pepper);
+		boolean isValidUser = false;
+		//メールアドレスとパスワードが未入力でない場合
+		if (email != null && !email.equals("") && plainPass != null && !plainPass.equals("")) {
+			//メールアドレス、パスワードを条件に取得したデータをUserViewのインスタンスで返却
+			UserView uv = findOne(email, plainPass, pepper);
 
-        boolean validateEmail = false;
-        boolean validatePass = false;
-        //メールアドレスが登録されているものとあっていればパスワードを変更
-        if((savedUser.getEmail()).equals(uv.getEmail())) {
+			if (uv != null && uv.getId() != null) {
 
-            if(uv.getPassword() != null && uv.getPassword().equals("")) {
-                //パスワードに入力がある場合
+				//データが認証できた場合、認証成功
+				isValidUser = true;
+			}
+		}
+		//認証結果を返却する
+		return isValidUser;
+	}
 
-                //パスワードについてのバリデーションを行う
-                validatePass = true;
+	/**
+	 * ユーザーデータを一件登録する
+	 * @param uv ユーザーデータ
+	 */
+	private void create(UserView uv) {
 
-                //変更後のパスワードをハッシュ化し設定する
-                savedUser.setPassword(
-                        EncryptUtil.getPasswordEncrypt(uv.getPassword(), pepper));
-                savedUser.setName(uv.getName());
-            }
-        }
+		em.getTransaction().begin();
+		em.persist(UserConverter.toModel(uv));
+		em.getTransaction().commit();
+	}
 
-          //更新内容にバリデーションを行う
-            List<String> errors  = UserValidator.validate(this, savedUser, validateEmail, validatePass);
+	/**
+	 * ユーザーデータを更新する
+	 * @param uv  画面から入力されたユーザーの登録内容
+	 */
+	private void update(UserView uv) {
 
-            //バリデーションエラーがなければデータを更新する
-            if(errors.size() == 0) {
-                update(savedUser);
-            }
+		em.getTransaction().begin();
+		User u = findOneInternal(uv.getId());
+		UserConverter.copyViewToModel(u, uv);
+		em.getTransaction().commit();
+	}
 
-        //エラーを返却（エラーがなければ０件のリスト）
-        return errors;
-    }
+	public UserView findOneByEmail(String email) {
 
-    public Boolean validateLogin(String email, String plainPass, String pepper) {
+		User u = null;
+		try {
+			//メールアドレスとハッシュ化済みパスワードを条件にユーザーを一件取得
+			u = em.createNamedQuery(JpaConst.Q_USER_GET_BY_EMAIL, User.class)
+					.setParameter(JpaConst.JPQL_PARM_EMAIL, email)
+					.getSingleResult();
 
-        boolean isValidUser = false;
-        //メールアドレスとパスワードが未入力でない場合
-        if(email != null && !email.equals("") && plainPass != null && !plainPass.equals("")){
-            //メールアドレス、パスワードを条件に取得したデータをUserViewのインスタンスで返却
-            UserView uv = findOne(email, plainPass, pepper);
+			return UserConverter.toView(u);
+		}catch(Exception e) {
+			return null;
+		}
 
-            if(uv != null && uv.getId() != null) {
-
-                //データが認証できた場合、認証成功
-                isValidUser = true;
-            }
-        }
-        //認証結果を返却する
-        return isValidUser;
-    }
-
-    /**
-     * ユーザーデータを一件登録する
-     * @param uv ユーザーデータ
-     */
-    private void create(UserView uv) {
-
-        em.getTransaction().begin();
-        em.persist(UserConverter.toModel(uv));
-        em.getTransaction().commit();
-    }
-
-    /**
-     * ユーザーデータを更新する
-     * @param uv  画面から入力されたユーザーの登録内容
-     */
-    private void update(UserView uv) {
-
-        em.getTransaction().begin();
-        User u =  findOneInternal(uv.getId());
-        UserConverter.copyViewToModel(u, uv);
-        em.getTransaction().commit();
-    }
-
-
+	}
 
 }

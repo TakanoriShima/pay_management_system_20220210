@@ -33,7 +33,10 @@ import lombok.Setter;
             query = JpaConst.Q_USER_COUNT_RESISTERED_BY_EMAIL_DEF),
     @NamedQuery(
             name = JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD,
-            query = JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD_DEF)
+            query = JpaConst.Q_USER_GET_BY_EMAIL_AND_PASSWORD_DEF),
+    @NamedQuery(
+            name = JpaConst.Q_USER_GET_BY_EMAIL,
+            query = JpaConst.Q_USER_GET_BY_EMAIL_DEF)
 })
 
 @Getter  //全てのクラスフィールドのgetterを自動生成　

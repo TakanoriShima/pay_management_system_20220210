@@ -1,6 +1,7 @@
 package actions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,134 +11,151 @@ import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.MessageConst;
 import constants.PropertyConst;
+import models.validators.UserValidator;
 import services.UserService;
 
 public class UserAction extends ActionBase {
 
-    private UserService service;
-    @Override
-    public void process() throws ServletException, IOException {
+	private UserService service;
 
-        service = new UserService();
+	@Override
+	public void process() throws ServletException, IOException {
 
-        //メソッドを実行
-        invoke();
+		service = new UserService();
 
-        service.close();
-    }
+		//メソッドを実行
+		invoke();
 
-    /**
-     * 新規登録画面を表示する
-     * @throws ServletException
-     * @throws IOException
-     */
-    public void entryNew() throws ServletException, IOException {
+		service.close();
+	}
 
-        putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
-        putRequestScope(AttributeConst.USER, new UserView());  //空のユーザーインスタンス
+	/**
+	 * 新規登録画面を表示する
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void entryNew() throws ServletException, IOException {
 
-        //新規登録画面を表示
-        forward(ForwardConst.FW_USER_NEW);
-    }
+		putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策用トークン
+		putRequestScope(AttributeConst.USER, new UserView()); //空のユーザーインスタンス
 
-    /**
-     * 新規登録を行う
-     * @throws ServletException
-     * @throws IOException
-     */
-    public void create() throws ServletException, IOException {
+		//新規登録画面を表示
+		forward(ForwardConst.FW_USER_NEW);
+	}
 
-        //CSRF対策 tokenのチェック
-        if(checkToken()) {
+	/**
+	 * 新規登録を行う
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void create() throws ServletException, IOException {
 
-            //パラメータの値を元にユーザー情報のインスタンスを作成する
-            UserView uv  = new UserView(
-                    null,
-                    getRequestParam(AttributeConst.USER_NAME),
-                    getRequestParam(AttributeConst.USER_EMAIL),
-                    getRequestParam(AttributeConst.USER_PASSWORD));
+		//CSRF対策 tokenのチェック
+		if (checkToken()) {
 
-            //アプリケーションスコープからpepper文字列を取得
-            String pepper = getContextScope(PropertyConst.PEPPER);
+			//パラメータの値を元にユーザー情報のインスタンスを作成する
+			UserView uv = new UserView(
+					null,
+					getRequestParam(AttributeConst.USER_NAME),
+					getRequestParam(AttributeConst.USER_EMAIL),
+					getRequestParam(AttributeConst.USER_PASSWORD));
 
-            //ユーザー情報登録
-            List<String> errors = service.create(uv, pepper);
+			//アプリケーションスコープからpepper文字列を取得
+			String pepper = getContextScope(PropertyConst.PEPPER);
 
-            //登録中にエラーがあった場合
-            if(errors.size() > 0) {
+			//ユーザー情報登録
+			List<String> errors = service.create(uv, pepper);
 
-                putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
-                putRequestScope(AttributeConst.USER, uv);  //入力されたユーザー情報
-                putRequestScope(AttributeConst.ERR, errors);  //エラーのリスト
+			//登録中にエラーがあった場合
+			if (errors.size() > 0) {
 
-                //新規登録画面を再表示
-                forward(ForwardConst.FW_USER_NEW);
+				putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策用トークン
+				putRequestScope(AttributeConst.USER, uv); //入力されたユーザー情報
+				putRequestScope(AttributeConst.ERR, errors); //エラーのリスト
 
-            }else {
-                //登録中にエラーがなかった場合
+				//新規登録画面を再表示
+				forward(ForwardConst.FW_USER_NEW);
 
-                //セッションに登録完了のフラッシュメッセージを設定
-                putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERED.getMessage());
+			} else {
+				//登録中にエラーがなかった場合
 
-                //一覧画面にリダイレクト
-                redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
-            }
-        }
-    }
+				//セッションに登録完了のフラッシュメッセージを設定
+				putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERED.getMessage());
 
-    /**
-     * パスワード変更画面の表示
-     * @throws ServletException
-     * @throws IOException
-     */
-    public void edit() throws ServletException, IOException {
+				//一覧画面にリダイレクト
+				redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
+			}
+		}
+	}
 
-        putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
-        putSessionScope(AttributeConst.USER, new UserView());  //空のユーザーインスタンス
+	/**
+	 * パスワード変更画面の表示
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void edit() throws ServletException, IOException {
 
-        //編集画面を表示する
-        forward(ForwardConst.FW_USER_EDIT);
-    }
+		putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策用トークン
+		putSessionScope(AttributeConst.USER, new UserView()); //空のユーザーインスタンス
 
-    public void update() throws ServletException, IOException {
+		//編集画面を表示する
+		forward(ForwardConst.FW_USER_EDIT);
+	}
 
-        //CSRF対策 tokenのチェック
-        if(checkToken()) {
-            //パラメータの値を元にユーザー情報のインスタンスを作成する
-            UserView uv = new UserView(
-                    toNumber(getSessionScope(AttributeConst.USER_ID)),
-                    getSessionScope(AttributeConst.USER_NAME),
-                    getSessionScope(AttributeConst.USER_EMAIL),
-                    getSessionScope(AttributeConst.USER_PASSWORD));
+	public void update() throws ServletException, IOException {
 
-            //アプリケーションスコープからpepper文字列を取得
-            String pepper = getContextScope(PropertyConst.PEPPER);
+		//CSRF対策 tokenのチェック
+		if (checkToken()) {
 
-            //ユーザー情報更新
-            List<String> errors = service.update(uv, pepper);
+			// 空のエラー配列を作成
+			List<String> errors = new ArrayList<>();
 
-            if(errors.size() > 0) {
-                //更新中にエラーが発生した場合
+			// JSPで入力された値を取得
+			String email = getRequestParam(AttributeConst.USER_EMAIL);
+			String name = getRequestParam(AttributeConst.USER_NAME);
+			String plainPass = getRequestParam(AttributeConst.USER_PASSWORD);
+			String pepper = getContextScope(PropertyConst.PEPPER);
 
-                putRequestScope(AttributeConst.TOKEN, getTokenId());  //CSRF対策用トークン
-                putRequestScope(AttributeConst.USER, uv);  //入力されたユーザー情報
-                putRequestScope(AttributeConst.ERR, errors);  //エラーのリスト
+			// 入力されたメールアドレスを持つ UserViewインスタンスを探す
+			UserView uv = service.findOneByEmail(email);
+			System.out.println("見つけたユーザー" + uv);
 
-                //編集画面を再表示
-                forward(ForwardConst.FW_USER_EDIT);
+			// そんなメールアドレスを持つユーザーがいなければ
+			if (uv == null) {
+				errors.add("そのメールアドレスを持った人はいません");
+				System.out.println("いないユーザー" + uv);
+			} else {
+				// uvのフィールド値を変更
+				if(!name.equals("")) {
+					uv.setName(name);
+				}
+				uv.setPassword(plainPass);
+				// 入力値の検証
+				errors = UserValidator.validate(service, uv, false, true);
+			}
 
-            }else {
-                //更新中にエラーがなかった場合
+			// 入力がすべて正しくおこなわれていれば
+			if (errors.size() == 0) {
 
-                //セッションに更新完了のフラッシュメッセージを設定
-                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATE.getMessage());
+				service.update(uv, pepper);
+				//セッションに更新完了のフラッシュメッセージを設定
+				putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATE.getMessage());
 
-                //ログイン画面にリダイレクト
-                redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
-            }
-        }
-    }
+				//ログイン画面にリダイレクト
+				redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_SHOW_LOGIN);
+			} else {
 
+				//更新中にエラーが発生した場合
 
+				putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策用トークン
+				putRequestScope(AttributeConst.USER, uv); //入力されたユーザー情報
+				putRequestScope(AttributeConst.ERR, errors); //エラーのリスト
+				System.out.println("再入力");
+				//編集画面を再表示
+				forward(ForwardConst.FW_USER_EDIT);
+			}
+
+		}
+	}
 
 }

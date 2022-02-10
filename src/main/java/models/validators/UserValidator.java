@@ -21,6 +21,7 @@ public class UserValidator {
 
         //メールアドレスのチェック
         String emailError = validateEmail(service, uv.getEmail(), codeDuplicateCheckFlag);
+
         //エラーメッセージがあれば、errorsにメッセージを格納
         if(!emailError.equals("")) {
             errors.add(emailError);
